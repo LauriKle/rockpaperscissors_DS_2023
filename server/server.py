@@ -3,14 +3,14 @@ import time
 import sys
 import mysql.connector
 
-HOST = ''
+HOST = '0.0.0.0'
 PORT = 8000
 DELAYTIME = 0
 
 def connect_db():
     try:
         return mysql.connector.connect(
-            host="localhost",
+            host="sqlhost",
             port="3306",
             user="root",
             password="password",
@@ -63,14 +63,13 @@ def attempt_to_play_move(id, move):
     elif data == "That game doesn't exist yet.":
         save_result(id, move, "None", "In progress")
         return "Played your hand."
-    if type(data) == list:
+    if type(data) == tuple:
         if data[2] != "None":
             return "That game is already completed. Try another game Id."
         else:
             result = get_result(data[1], move)
             save_result(id, data[1], move, result)
-            response = ' '.join(str(elem) for elem in result)
-            return response
+            return result
     else:
         print("Something went wrong.")
         return "Something went wrong. Try again later."
@@ -97,7 +96,8 @@ def interpret_input(conn):
                 game_id = int(input[1])
                 stat = get_game_data(game_id)
                 if stat is not None:
-                   send_data_back(conn, stat)
+                   res = response = ' '.join(str(elem) for elem in stat)
+                   send_data_back(conn, res)
                 else:
                     send_data_back(conn, "Something went wrong. Try again later.")
             except (IndexError, ValueError):

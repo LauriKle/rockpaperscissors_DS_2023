@@ -2,7 +2,7 @@ import socket
 import threading
 
 PORT = 8888
-SERVERS = [('localhost', 8000), ('localhost', 8001), ('localhost', 8002)]
+SERVERS = [('server1', 8000), ('server2', 8001), ('server3', 8002)]
 MAX_FAILURES = 3
 current_server_index = 0
 
@@ -41,7 +41,7 @@ def redirect_request(conn, addr, request_data):
 
 def start():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind(('localhost', PORT))
+        s.bind(('0.0.0.0', PORT))
         s.listen()
         print(f'Load balancer is listening on port {PORT}...')
         while True:
