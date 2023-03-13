@@ -34,5 +34,5 @@ docker run --name server3 -d -p 8002:8002 --network my_network myserver3
 
 The servers are identical in all aspects except for their names and ports. If you want to test a server with an added delay to simulate timing problems, modify the Dockerfile of a client with the amount of seconds to wait as an argument, like: CMD [ "python","-u","server.py","8000","5"]
 
-Then run client.py normally. Multiple clients can be run at the same time. Maximum number of clients with three servers is three clients.
+Then run client.py normally. Multiple clients can be run at the same time.
 Use the command "help" to get info on what commands you can use.
