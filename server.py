@@ -3,22 +3,20 @@ import os
 import sqlite3
 import time
 import sys
+import mysql.connector
 
 HOST = ''
 PORT = 8000
 DELAYTIME = 5
 
-if not os.path.exists('game.db'):
-    conn = sqlite3.connect('game.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE games
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  first_move TEXT,
-                  second_move TEXT,
-                  result TEXT)''')
-    conn.commit()
-    conn.close()
-
+def connect_db():
+    return mysql.connector.connect(
+        host="localhost",
+        port="3306",
+        user="username",
+        password="password",
+        database="game"
+    )
 
 def get_result(first_move, second_move):
     if first_move == second_move:
@@ -31,22 +29,22 @@ def get_result(first_move, second_move):
         return "The second move won!"
 
 def save_result(id, first_move, second_move, result):
-    conn = sqlite3.connect('game.db')
-    c = conn.cursor()
-    c.execute("SELECT COUNT(*) FROM games WHERE id=?", (id,))
-    count = c.fetchone()[0]
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM games WHERE id=%s", (id,))
+    count = cursor.fetchone()[0]
     if count == 0:
-        c.execute("INSERT INTO games (id, first_move, second_move, result) VALUES (?, ?, ?, ?)", (id, first_move, second_move, result))
+        cursor.execute("INSERT INTO games (id, first_move, second_move, result) VALUES (%s, %s, %s, %s)", (id, first_move, second_move, result))
     else:
-        c.execute("UPDATE games SET first_move=?, second_move=?, result=? WHERE id=?", (first_move, second_move, result, id))
+        cursor.execute("UPDATE games SET first_move=%s, second_move=%s, result=%s WHERE id=%s", (first_move, second_move, result, id))
     conn.commit()
     conn.close()
 
 def get_game_data(id):
-    conn = sqlite3.connect('game.db')
-    c = conn.cursor()
-    c.execute("SELECT id, first_move, second_move, result FROM games WHERE id=?", (id,))
-    row = c.fetchone()
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, first_move, second_move, result FROM games WHERE id=%s", (id,))
+    row = cursor.fetchone()
     conn.close()
     if row is None:
         return None
