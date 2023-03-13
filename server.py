@@ -1,13 +1,11 @@
 import socket
-import os
-import sqlite3
 import time
 import sys
 import mysql.connector
 
 HOST = ''
 PORT = 8000
-DELAYTIME = 5
+DELAYTIME = 0
 
 def connect_db():
     try:
@@ -20,6 +18,7 @@ def connect_db():
         )
     except mysql.connector.Error as exc:
         print("DB connection failed: {}".format(exc))
+        return None
 
 def get_result(first_move, second_move):
     if first_move == second_move:
@@ -32,43 +31,49 @@ def get_result(first_move, second_move):
         return "The second move won!"
 
 def save_result(id, first_move, second_move, result):
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT COUNT(*) FROM games WHERE id=%s", (id,))
-    count = cursor.fetchone()[0]
-    if count == 0:
-        cursor.execute("INSERT INTO games (id, first_move, second_move, result) VALUES (%s, %s, %s, %s)", (id, first_move, second_move, result))
-    else:
-        cursor.execute("UPDATE games SET first_move=%s, second_move=%s, result=%s WHERE id=%s", (first_move, second_move, result, id))
-    conn.commit()
-    conn.close()
+    cnx = connect_db()
+    if cnx == None:
+        return "Something went wrong. Try again later."
+    cursor = cnx.cursor()
+    cursor.execute("INSERT INTO games (id, first_move, second_move, result) "
+                "VALUES (%s, %s, %s, %s)",
+                (id, first_move, second_move, result))
+    cnx.commit()
+    cursor.close()
+    cnx.close()
 
 def get_game_data(id):
-    conn = connect_db()
-    cursor = conn.cursor()
+    cnx = connect_db()
+    if cnx == None:
+        return None
+    cursor = cnx.cursor()
     cursor.execute("SELECT id, first_move, second_move, result FROM games WHERE id=%s", (id,))
     row = cursor.fetchone()
-    conn.close()
+    cursor.close()
+    cnx.close()
     if row is None:
-        return None
+        return "That game doesn't exist yet."
     else:
         return (row[0], row[1], row[2], row[3])
 
 def attempt_to_play_move(id, move):
     data = get_game_data(id)
-    if data is not None:
-        if data[1] != "None" and data[2] == "None":
-            res = get_result(data[1], move)
-            save_result(id, data[1], move, res)
-            outcome = res
-        elif data[1] != "None" and data[2] != "None":
-            outcome = "That game is already completed. Try another game Id."
-        else:
-            outcome = "Something weird happened. Couldn't play game."
-    else:
+    if data is None:
+        return "Something went wrong. Try again later."
+    elif data == "That game doesn't exist yet.":
         save_result(id, move, "None", "In progress")
-        outcome = "Played your hand."
-    return outcome
+        return "Played your hand."
+    if type(data) == list:
+        if data[2] != "None":
+            return "That game is already completed. Try another game Id."
+        else:
+            result = get_result(data[1], move)
+            save_result(id, data[1], move, result)
+            response = ' '.join(str(elem) for elem in result)
+            return response
+    else:
+        print("Something went wrong.")
+        return "Something went wrong. Try again later."
 
 def send_data_back(conn, data):
     try:
@@ -92,10 +97,9 @@ def interpret_input(conn):
                 game_id = int(input[1])
                 stat = get_game_data(game_id)
                 if stat is not None:
-                    answer = ' '.join([str(elem) for elem in stat])
-                    send_data_back(conn, answer)
+                   send_data_back(conn, stat)
                 else:
-                    send_data_back(conn, "There is no game with that id yet.")
+                    send_data_back(conn, "Something went wrong. Try again later.")
             except (IndexError, ValueError):
                 send_data_back(conn, "Invalid status command syntax.")
         elif input[0] == "play":
