@@ -4,4 +4,4 @@ ADD server.py .
 
 RUN pip install mysql-connector-python
 
-CMD [ "python","-u","server.py"]
+CMD [ "python","-u","server.py","8000"]
