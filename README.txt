@@ -1,3 +1,7 @@
+This "game" is the final project for a distributed systems course. The game itself is extremely rudimentary.
+
+INSTRUCTIONS:
+
 Make sure you have Docker installed.
 
 First of all, create a network called my_network:
