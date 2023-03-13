@@ -35,9 +35,8 @@ def save_result(id, first_move, second_move, result):
     if cnx == None:
         return "Something went wrong. Try again later."
     cursor = cnx.cursor()
-    cursor.execute("INSERT INTO games (id, first_move, second_move, result) "
-                "VALUES (%s, %s, %s, %s)",
-                (id, first_move, second_move, result))
+    cursor.execute("INSERT INTO games (id, first_move, second_move, result) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE first_move=%s, second_move=%s, result=%s",
+                            (id, first_move, second_move, result, first_move, second_move, result))
     cnx.commit()
     cursor.close()
     cnx.close()
