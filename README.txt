@@ -1,4 +1,4 @@
-This "game" is the final project for a distributed systems course. The game itself is extremely rudimentary.
+This "game" is the final project for a distributed systems course. The game itself is extremely rudimentary and doesn't make perfect sense as a rock-paper-scissors game. (For example, a client can find out what their opponent's move before they play their own move.) Clients aren't differentiated in any way either, but the game was left simple to make way for a better distributed system.
 
 INSTRUCTIONS:
 
@@ -40,3 +40,10 @@ The servers are identical in all aspects except for their names and ports. If yo
 
 Then run client.py normally. Multiple clients can be run at the same time.
 Use the command "help" to get info on what commands you can use.
+To demonstrate that the system works, try the commands:
+status 0
+play 0 r
+status 0
+play 0 p
+status 0
+This checks the the status of the game with the ID 0 (which at first doesn't exist), plays rock (creating the game with the specified ID), checks the status again (and funnily enough, reveals what the first move was), plays paper (finishing the game), and checks the status again. Switch to another game by trying another game ID, whatever integer is fine.
