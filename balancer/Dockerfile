@@ -4,7 +4,8 @@ WORKDIR /app
 
 COPY balancer.py .
 
-RUN pip install socket threading
+RUN pip install socket
+RUN pip install threading
 
 EXPOSE 8888
 
