@@ -10,13 +10,16 @@ PORT = 8000
 DELAYTIME = 5
 
 def connect_db():
-    return mysql.connector.connect(
-        host="localhost",
-        port="3306",
-        user="username",
-        password="password",
-        database="game"
-    )
+    try:
+        return mysql.connector.connect(
+            host="localhost",
+            port="3306",
+            user="root",
+            password="password",
+            database="game"
+        )
+    except mysql.connector.Error as exc:
+        print("DB connection failed: {}".format(exc))
 
 def get_result(first_move, second_move):
     if first_move == second_move:
