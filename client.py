@@ -25,7 +25,7 @@ def play_game():
                     data = s.recv(1024).decode('utf-8')
                     print(data)
                 except (socket.timeout):
-                    print("Oops, something went wrong. Please try again.")
+                    print("Something went wrong. Please try again.")
 
 
 if __name__ == '__main__':
