@@ -13,8 +13,24 @@ navigate to the directory balancer
 docker build -t myloadbalancer .
 docker run --name balancer1 -d -p 8888:8888 --network my_network myloadbalancer
 
-To start a server instance:
+
+You need to start at least one server instance to use the system.
+To start server instances:
+
+Server1:
+navigate to server's directory
 docker build -t myserver .
 docker run --name server1 -d -p 8000:8000 --network my_network myserver
 
-Then run client.py.
+Server2:
+navigate to server2's directory
+docker build -t myserver2 .
+docker run --name server2 -d -p 8001:8001 --network my_network myserver2
+
+Server3:
+navigate to server3's directory
+docker build -t myserver3 .
+docker run --name server3 -d -p 8002:8002 --network my_network myserver3
+
+The servers are identical in all aspects except for their names and ports. If you want to test a server with an added delay to simulate timing problems, modify the Dockerfile of a client with the amount of seconds to wait as an argument, like: CMD [ "python","-u","server.py","8000","5"]
+Then run client.py. Multiple clients can be run at the same time. Maximum number of clients with three servers is, of course, three clients.
